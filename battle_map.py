@@ -25,7 +25,7 @@ class BattleMap:
         return self.my_view.place_ship(coord, self.battleship)
 
     def place_cruiser(self, coord):
-        return self.my_view.place_ship(coord, self.carrier)
+        return self.my_view.place_ship(coord, self.cruiser)
 
     def place_submarine(self, coord):
         return self.my_view.place_ship(coord, self.submarine)
