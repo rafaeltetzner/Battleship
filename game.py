@@ -1,5 +1,13 @@
 from player import Player
 
+# A parte de redes será estruturada da seguinte forma:
+
+'''
+(Na mesma máquina) :
+
+1 thread servidor (principal do programa) que é responsável pela lógica e manutenção de estados
+compartilhados, junto de guardar as informações de inicialização e configuração das portas
+'''
 
 class Game:
     def __init__(self):
