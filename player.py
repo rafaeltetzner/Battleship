@@ -1,11 +1,11 @@
 from battle_map import BattleMap
 from ship import Ship
+from server import Server
 
 
 class Player:
-    def __init__(self, server, num):
-        server.registerPlayer(num)
-        self.num = num
+    def __init__(self, server):
+        server.registerPlayer()
         self.battle_map = BattleMap()
 
     def init_ships(self):
@@ -64,28 +64,19 @@ class Player:
             else:
                 break
 
-    def on_turn(self, enemy, coord):
+    def atingiu(self, inimigo, coord):
+        # Atualiza a estrutura de dados em si e devolve se eh agua (XX) ou fogo (SIMBOLO DO NAVIO)
         self.battle_map.draw4me()
-        coord = input("> Where would you like to attack? (ex A2): ").upper()
-
-        while True:
-            if not self._validate_input(coord):
-                print(">> Invalid input")
-       
-            else:
-                break
-        
-        return coord
 
     def have_lost(self):
         return self.battle_map.check_if_lost()
 
-    # @staticmethod
-    def _validate_input(coord):
-        if len(coord) > 2:
-            return False
-        if coord[0] < 'A' or coord[0] > 'J':
-            return False
-        if coord[1] < '0' or coord[1] > '9':
-            return False
-        return True
+    # # @staticmethod
+    # def _validate_input(coord):
+    #     if len(coord) > 2:
+    #         return False
+    #     if coord[0] < 'A' or coord[0] > 'J':
+    #         return False
+    #     if coord[1] < '0' or coord[1] > '9':
+    #         return False
+    #     return True

@@ -12,35 +12,29 @@ compartilhados, junto de guardar as informações de inicialização e configura
 
 class Game:
     def __init__(self):
+        # Inicializa o servidor e os jogadores, que sao registrados no servidor 
         self.server = Server()
-        self.p1 = Player(self.server, 1)
-        self.p2 = Player(self.server, 2)
+        self.p1 = Player(self.server)
+        self.p2 = Player(self.server)
         self.turn = 1
 
     def run(self):
-        self.p1.init_ships()
-        self.p2.init_ships()
+        # Implementar no cliente
+        #self.p1.init_ships()
+        #self.p2.init_ships()
+        self.server.posiciona_ships(self.p1, 1)
+        self.server.posiciona_ships(self.p2, 2)
 
         while True:
             
             self.server.jogada(self.p1, self.p2, self.turn)
             self.turn = 2
 
-            # self.p1.on_turn(self.p2)
-            # self.p2.on_turn(self.p1)
-
             self.server.jogada(self.p1, self.p2, self.turn)
             self.turn = 1
 
             if self.p1.have_lost() or self.p2.have_lost():
                 break
-
-        if self.p1.have_lost():
-            print("+---+---+---+PLAYER2 HAS WON+---+---+---+")
-            # server.informaResultados(vencedor = 2)
-        else:
-            print("+---+---+---+PLAYER1 HAS WON+---+---+---+")
         
-
-
-
+        vencedor = 2 if self.p1.have_lost() else 1
+        self.server.informaResultados(vencedor)

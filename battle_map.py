@@ -7,12 +7,12 @@ class BattleMap:
     def __init__(self):
         self.my_view = TileMap()
         self.enemy_view = TileMap()
-        self.carrier = Ship(5, 2, "A0", 'C')
-        self.destroyer = Ship(6, 1, "A2", 'D')
-        self.battleship = Ship(5, 1, "A3", 'B')
-        self.cruiser = Ship(4, 1, "A4", 'c')
-        self.submarine = Ship(4, 1, "A5", 'S')
-        self.patrol = Ship(3, 1, "A6", 'P')
+        self.carrier = Ship(5, 2, "A0", 'CC')
+        self.destroyer = Ship(6, 1, "A2", 'DD')
+        self.battleship = Ship(5, 1, "A3", 'BB')
+        self.cruiser = Ship(4, 1, "A4", 'CR')
+        self.submarine = Ship(4, 1, "A5", 'SS')
+        self.patrol = Ship(3, 1, "A6", 'PT')
         self.ships = [self.carrier, self.destroyer, self.battleship, self.cruiser, self.submarine, self.patrol]
 
     def place_carrier(self, coord):
@@ -62,3 +62,20 @@ class BattleMap:
             if ship.is_alive():
                 return False
         return True
+
+    def is_hit(self, coord) -> bool:
+        if self.my_view.get(coord) != ' ':
+            return True
+        return False
+    
+    def bomb(self, coord):
+        symbol4enemy = self.my_view.get(coord)
+        if symbol4enemy == ' ':
+            symbol4enemy = 'XX'
+        self.enemy_view.set(coord, symbol4enemy)
+        self.my_view.set(coord, 'XX')
+        for ship in self.ships:
+            if ship.contains(coord):
+                ship.hit()
+                break
+        return symbol4enemy
