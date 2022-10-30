@@ -10,11 +10,10 @@ class Cliente():
 
     def __init__(self):
 
-        self.battle_map_my_view = BattleMap()
-        self.battle_map_enemy_view = BattleMap()
-        self.nomes_navios = ['porta avios', 'destruidor', 'navio de batalha', 'crusador', 'submarino', 'patrulhador']
+        self.battle_map= BattleMap()
 
         self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.cliente.setblocking(True)
         
         self.vezInicial = self.receive_message()
 
@@ -67,7 +66,9 @@ class Cliente():
         while not fimDoJogo:
 
             try:
-                # self.battle_map_view_view.draw4me()
+                self.battle_map.my_view.draw()
+                self.battle_map.enemy_view.draw()
+
                 if minhaVez:
                     coord = input("> Onde voce quer atacar? (ex A2): ").upper()
 
@@ -107,7 +108,7 @@ class Cliente():
         print(mensagemFinal)
         sys.exit() #acabou o jogo
 
-    def validate_input_format(coord):
+    def validate_input_format(self, coord):
         if len(coord) > 2:
             return False
         if coord[0] < 'A' or coord[0] > 'J':
@@ -119,20 +120,20 @@ class Cliente():
 
     #passa as coordenadas dos navios para o servidor de modo a posiciona-los
     def init_ship(self):
-        for ship in self.battle_map_my_view.ships:
-            self.battle_map_my_view.draw4me()
+        for ship in self.battle_map.ships:
+            self.battle_map.my_view.draw()
             while True:
-                coord = input("> Onde voce gostaria de posicionar o {}? (ex A2): ").format(ship.name).upper()
+                coord = input("> Onde voce gostaria de posicionar o {}? (ex A2): ".format(ship.name)).upper()
                 if not self.validate_input_format(coord):
                     print(">> Input invalido")
                     continue
                 self.cliente.send(coord.encode('utf-8'))
                 feedback = self.receive_message()
                 if(feedback == self.POSICAO_INVALIDA):
-                    print(">> O {} nao se encaixa nessa posicao").format(ship.name)
+                    print(">> O {} nao se encaixa nessa posicao".format(ship.name))
                     continue
                 else:
-                    self.battle_map_my_view.place_ship(coord, ship)
+                    self.battle_map.place_ship(coord, ship)
                     break
 
 # inputValido = False 

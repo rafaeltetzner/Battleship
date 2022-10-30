@@ -28,6 +28,7 @@ class Server:
         
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket.setblocking(True)
 
         self.num_registered_players = 0
         self.clientSockets = {1: '', 2: ''}
