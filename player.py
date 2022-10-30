@@ -3,7 +3,9 @@ from ship import Ship
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, server, num):
+        server.registerPlayer(num)
+        self.num = num
         self.battle_map = BattleMap()
 
     def init_ships(self):
@@ -62,25 +64,23 @@ class Player:
             else:
                 break
 
-    def on_turn(self, enemy):
-        print("+---+---+---+---+PLAYER1+---+---+---+---+")
-        print("                 MYFLEET                 ")
+    def on_turn(self, enemy, coord):
         self.battle_map.draw4me()
-        print("               THEIR FLEET                 ")
-        enemy.battle_map.draw4enemy()
+        coord = input("> Where would you like to attack? (ex A2): ").upper()
+
         while True:
-            coord = input("> Where would you like to shoot? (ex A2): ").upper()
             if not self._validate_input(coord):
                 print(">> Invalid input")
-            elif not enemy.battle_map.receive_bomb(coord):
-                print(">>Invalid bomb placement")
+       
             else:
                 break
+        
+        return coord
 
     def have_lost(self):
         return self.battle_map.check_if_lost()
 
-    @staticmethod
+    # @staticmethod
     def _validate_input(coord):
         if len(coord) > 2:
             return False
