@@ -1,10 +1,11 @@
 class Ship:
-    def __init__(self, length, width, coord, symbol):
+    def __init__(self, length, width, coord, symbol, name):
         self.length = length
         self.width = width
         self.coord = coord
         self.symbol = symbol
         self.num_hits = 0
+        self.name = name
 
     def fits_at(self, coord):
         if chr(self.length + ord(coord[0]) - 1) > 'J':
@@ -25,5 +26,3 @@ class Ship:
 
     def is_alive(self):
         return self.num_hits < self.length * self.width
-
-

@@ -7,31 +7,16 @@ class BattleMap:
     def __init__(self):
         self.my_view = TileMap()
         self.enemy_view = TileMap()
-        self.carrier = Ship(5, 2, "A0", 'CC')
-        self.destroyer = Ship(6, 1, "A2", 'DD')
-        self.battleship = Ship(5, 1, "A3", 'BB')
-        self.cruiser = Ship(4, 1, "A4", 'CR')
-        self.submarine = Ship(4, 1, "A5", 'SS')
-        self.patrol = Ship(3, 1, "A6", 'PT')
+        self.carrier = Ship(5, 2, "A0", 'CC', "porta-avioes")
+        self.destroyer = Ship(6, 1, "A2", 'DD', "destruidor")
+        self.battleship = Ship(5, 1, "A3", 'BB', "navio de batalha")
+        self.cruiser = Ship(4, 1, "A4", 'CR', "crusador")
+        self.submarine = Ship(4, 1, "A5", 'SS', "submarino")
+        self.patrol = Ship(3, 1, "A6", 'PT', "patrulhador")
         self.ships = [self.carrier, self.destroyer, self.battleship, self.cruiser, self.submarine, self.patrol]
 
-    def place_carrier(self, coord):
-        return self.my_view.place_ship(coord, self.carrier)
-
-    def place_destroyer(self, coord):
-        return self.my_view.place_ship(coord, self.destroyer)
-
-    def place_battleship(self, coord):
-        return self.my_view.place_ship(coord, self.battleship)
-
-    def place_cruiser(self, coord):
-        return self.my_view.place_ship(coord, self.cruiser)
-
-    def place_submarine(self, coord):
-        return self.my_view.place_ship(coord, self.submarine)
-
-    def place_patrol(self, coord):
-        return self.my_view.place_ship(coord, self.patrol)
+    def place_ship(self,coord, ship):
+        return self.my_view.place_ship(coord, ship)
 
     def draw4enemy(self):
         self.enemy_view.draw()

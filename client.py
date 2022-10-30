@@ -10,12 +10,15 @@ class Cliente():
 
     def __init__(self):
 
-        self.battle_map_view = BattleMap()
+        self.battle_map_my_view = BattleMap()
+        self.battle_map_enemy_view = BattleMap()
+        self.nomes_navios = ['porta avios', 'destruidor', 'navio de batalha', 'crusador', 'submarino', 'patrulhador']
 
         self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         self.vezInicial = self.receive_message()
 
+        self.POSICAO_VALIDA = 'PV'
         self.POSICAO_INVALIDA = 'PI'
 
         self.LOCALIZACAO_ERRADA = 'LE'
@@ -87,12 +90,12 @@ class Cliente():
 
                     else:
                         # Chegou aqui minha jogada foi valida
-                        self.battle_map_view.enemy_view(coord, feedback[0])
+                        self.battle_map_view.enemy_view.set(coord, feedback[0])
                         minhaVez = False
                 else:
                     _ = self.receive_message()
                     hit_coord = self.receive_message()
-                    self.battle_map_view.my_view(hit_coord, 'X')
+                    self.battle_map_view.my_view.set(hit_coord, 'X')
                     minhaVez = True
 
             except: #SIGKILL
@@ -116,87 +119,21 @@ class Cliente():
 
     #passa as coordenadas dos navios para o servidor de modo a posiciona-los
     def init_ship(self):
-        self.battle_map_view.draw4me()
-        while True:
-            coord = input("> Onde voce gostaria de posicionar o porta-avioes? (ex A2): ").upper()
-            if not self.validate_input_format(coord):
-                print(">> Input invalido")
-            # elif not self.battle_map_view.place_carrier(coord):
-            self.cliente.send(coord.encode('utf-8'))
-            feedback = self.receive_message()
-            if(feedback == self.POSICAO_INVALIDA):
-                print(">> O porta-avioes nao se encaixa nessa posicao")
-            else:
-                break
-        self.battle_map_view.draw4me()
-        while True:
-            # self.battle_map_view.draw4me()
-            coord = input("> Onde voce gostaria de posicionar o destruidor? (ex A2): ").upper()
-            if not self.validate_input_format(coord):
-                print(">> Input invalido")
-            #elif not self.battle_map_view.place_destroyer(coord):
-            self.cliente.send(coord.encode('utf-8'))
-            feedback = self.receive_message()
-            if(feedback == self.POSICAO_INVALIDA):
-                print(">> O destruidor nao se encaixa nessa posicao")
-            else:
-                self.battle_map_view.atualiza()
-                break
-        #self.battle_map_view.draw4me()
-        while True:
-            coord = input("> Onde voce gostaria de posicionar o navio de batalha? (ex A2): ").upper()
-            if not self.validate_input_format(coord):
-                print(">> Input invalido")
-            #elif not self.battle_map_view.place_battleship(coord):
-            self.cliente.send(coord.encode('utf-8'))
-            feedback = self.receive_message()
-            if(feedback == self.POSICAO_INVALIDA):
-                print(">> O navio de batalha nao se encaixa nessa posicao")
-            else:
-                self.battle_map_view.atualiza()
-                break
-        # self.battle_map_view.draw4me()
-        while True:
-            coord = input("> Onde voce gostaria de posicionar o cruzador? (ex A2): ").upper()
-            if not self.validate_input_format(coord):
-                print(">> Input invalido")
-            #elif not self.battle_map_view.place_cruiser(coord):
-            self.cliente.send(coord.encode('utf-8'))
-            feedback = self.receive_message()
-            if(feedback == self.POSICAO_INVALIDA):
-                print(">> O cruzador nao se encaixa nessa posicao")
-            else:
-                self.battle_map_view.atualiza()
-                break
-        # self.battle_map_view.draw4me()
-        while True:
-            coord = input("> Onde voce gostaria de posicionar o submarino? (ex A2): ").upper()
-            if not self.validate_input_format(coord):
-                print(">> Input invalido")
-            #elif not self.battle_map_view.place_submarine(coord):
-            self.cliente.send(coord.encode('utf-8'))
-            feedback = self.receive_message()
-            if(feedback == self.POSICAO_INVALIDA):
-                print(">> O submarino nao se encaixa nessa posicao")
-            else:
-                self.battle_map_view.atualiza()
-                break
-        # self.battle_map_view.draw4me()
-        while True:
-            coord = input("> Onde voce gostaria de posicionar o patrulhador? (ex A2): ").upper()
-            if not self.validate_input_format(coord):
-                print(">> Input invalido")
-            #elif not self.battle_map_view.place_submarine(coord):
-            self.cliente.send(coord.encode('utf-8'))
-            feedback = self.receive_message()
-            if(feedback == self.POSICAO_INVALIDA):
-                print(">> O patrulhador nao se encaixa nessa posicao")
-            else:
-                self.battle_map_view.atualiza()
-                break
-        # self.battle_map_view.draw4me()
-
-
+        for ship in self.battle_map_my_view.ships:
+            self.battle_map_my_view.draw4me()
+            while True:
+                coord = input("> Onde voce gostaria de posicionar o {}? (ex A2): ").format(ship.name).upper()
+                if not self.validate_input_format(coord):
+                    print(">> Input invalido")
+                    continue
+                self.cliente.send(coord.encode('utf-8'))
+                feedback = self.receive_message()
+                if(feedback == self.POSICAO_INVALIDA):
+                    print(">> O {} nao se encaixa nessa posicao").format(ship.name)
+                    continue
+                else:
+                    self.battle_map_my_view.place_ship(coord, ship)
+                    break
 
 # inputValido = False 
 

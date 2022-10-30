@@ -20,8 +20,7 @@ class Game:
 
     def run(self):
         # Implementar no cliente
-        #self.p1.init_ships()
-        #self.p2.init_ships()
+
         self.server.posiciona_ships(self.p1, 1)
         self.server.posiciona_ships(self.p2, 2)
 
@@ -33,8 +32,8 @@ class Game:
             self.server.jogada(self.p1, self.p2, self.turn)
             self.turn = 1
 
-            if self.p1.have_lost() or self.p2.have_lost():
+            if self.p1.perdeu() or self.p2.perdeu():
                 break
         
-        vencedor = 2 if self.p1.have_lost() else 1
+        vencedor = 2 if self.p1.perdeu() else 1
         self.server.informaResultados(vencedor)

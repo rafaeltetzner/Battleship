@@ -16,6 +16,7 @@ class Server:
         self.QUEUE_SIZE = 2
         self.MESSAGE_LENGHT =  2 #dois caracters definem a coordenada do espaço no mapa
 
+        self.POSICAO_VALIDA = 'PV'
         self.POSICAO_INVALIDA = 'PI'
 
         self.LOCALIZACAO_ERRADA = 'LE'
@@ -80,9 +81,7 @@ class Server:
         self.server_socket.bind((self.CLIENT_IP, self.PORT))
         self.server_socket.listen(self.QUEUE_SIZE)
 
-        read_socket, _, _ = select.select([self.server_socket],[],[])
-
-        client_socket, client_address = self.server_socket.accept()
+        client_socket, _= self.server_socket.accept()
 
         self.num_registered_players += 1
         self.clientSockets[self.num_registered_players] = client_socket
@@ -92,9 +91,12 @@ class Server:
         client_socket.send(vez.encode('utf-8'))
 
     def posiciona_ships(self, player, turn):
-        posicao = self.receive_message(turn)
-        if not player.battle_map.place_carrier(posicao):
-            self.clientSockets[turn].send(self.POSICAO_INVALIDA.endode('utf-8'))
+        for ship in player.battle_map.ships:
+            posicao = self.receive_message(turn)
+            if not player.battle_map.place_ship(posicao, ship):
+                self.clientSockets[turn].send(self.POSICAO_INVALIDA.encode('utf-8'))
+            else:
+                self.clientSockets[turn].send(self.POSICAO_VALIDA.encode('utf-8'))
 
     def receive_message(self, turn):
 
