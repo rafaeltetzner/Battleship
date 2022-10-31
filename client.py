@@ -15,10 +15,11 @@ class Cliente():
         self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.cliente.setblocking(True)
         
-        self.vezInicial = self.receive_message()
-
         self.POSICAO_VALIDA = 'PV'
         self.POSICAO_INVALIDA = 'PI'
+
+        self.UNBLOCK1 = 'U1'
+        self.UNBLOCK2 = 'U2'
 
         self.LOCALIZACAO_ERRADA = 'LE'
         self.ESPERA_VEZ = 'EV'
@@ -28,13 +29,18 @@ class Cliente():
         self.VENCEDOR = 'VV'
         self.PERDEDOR= 'PP'
 
-        self.AGUA = 'XX'
-
         self.SERVER_IP = socket.gethostname()
-        self.SERVER_PORT = 1234 
+        self.SERVER_PORT = 55555 
         self.MSG_SIZE = 2 # Tamanho mínimo de mensagem pelo protocolo TCP = 20
 
         self.cliente.connect((self.SERVER_IP, self.SERVER_PORT))
+        self.vezInicial = self.receive_message()
+
+        if(self.vezInicial != self.SUA_VEZ):
+            msg = self.vezInicial
+            while(msg != self.UNBLOCK2):
+                msg = self.receive_message()
+
 
     def receive_message(self):
 
@@ -62,6 +68,14 @@ class Cliente():
 
         fimDoJogo = False
         minhaVez = True if self.vezInicial == self.SUA_VEZ else False 
+
+        if(minhaVez):
+            #Bloqueia player 1 até q 2 esteja pronto
+            
+            msg = self.vezInicial
+            if(msg != self.UNBLOCK1):                            
+                while(msg != self.UNBLOCK1):
+                    msg = self.receive_message()
 
         while not fimDoJogo:
 
@@ -91,9 +105,11 @@ class Cliente():
 
                     else:
                         # Chegou aqui minha jogada foi valida
+                        print("OI")
                         self.battle_map_view.enemy_view.set(coord, feedback[0])
                         minhaVez = False
                 else:
+                    
                     _ = self.receive_message()
                     hit_coord = self.receive_message()
                     self.battle_map_view.my_view.set(hit_coord, 'X')
@@ -128,6 +144,8 @@ class Cliente():
                     print(">> Input invalido")
                     continue
                 self.cliente.send(coord.encode('utf-8'))
+                print("Enviei " + coord)
+
                 feedback = self.receive_message()
                 if(feedback == self.POSICAO_INVALIDA):
                     print(">> O {} nao se encaixa nessa posicao".format(ship.name))

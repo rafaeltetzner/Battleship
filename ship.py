@@ -8,9 +8,10 @@ class Ship:
         self.name = name
 
     def fits_at(self, coord):
+        print(coord)
         if chr(self.length + ord(coord[0]) - 1) > 'J':
             return False
-        if chr(self .width + ord(coord[1]) - 1) > '9':
+        if chr(self.width + ord(coord[1]) - 1) > '9':
             return False
         return True
 

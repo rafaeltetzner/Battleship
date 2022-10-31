@@ -24,6 +24,7 @@ class Game:
         self.server.posiciona_ships(self.p1, 1)
         self.server.posiciona_ships(self.p2, 2)
 
+
         while True:
             
             self.server.jogada(self.p1, self.p2, self.turn)

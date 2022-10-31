@@ -1,5 +1,10 @@
+from distutils.log import error
 import socket 
 import select
+from signal import signal, SIGPIPE, SIG_DFL 
+signal(SIGPIPE,SIG_DFL)
+
+
 
 # Python versão 3.8.10 (Colocar assert com mensagem de warning)
 
@@ -10,17 +15,21 @@ class Server:
 
     def __init__(self):
 
-        self.PORT= 1234 
+        self.PORT= 55555 
         self.CLIENT_IP = socket.gethostname()
         
         self.QUEUE_SIZE = 2
-        self.MESSAGE_LENGHT =  2 #dois caracters definem a coordenada do espaço no mapa
+        self.MESSAGE_LENGTH =  2 #dois caracters definem a coordenada do espaço no mapa
 
         self.POSICAO_VALIDA = 'PV'
         self.POSICAO_INVALIDA = 'PI'
 
+        self.UNBLOCK1 = 'U1' 
+        self.UNBLOCK2 = 'U2' 
+
         self.LOCALIZACAO_ERRADA = 'LE'
         self.SUA_VEZ= 'SV'
+        self.ESPERA_VEZ = 'EV'
         self.FIM_DE_JOGO= 'FJ'
 
         self.VENCEDOR = 'VV'
@@ -30,9 +39,13 @@ class Server:
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.setblocking(True)
 
+        self.server_socket.bind((self.CLIENT_IP, self.PORT))
+        self.server_socket.listen(self.QUEUE_SIZE)
+
         self.num_registered_players = 0
         self.clientSockets = {1: '', 2: ''}
         self.clientSockets_lists = []
+
 
 
     def jogada(self, player1, player2, turn):
@@ -57,7 +70,7 @@ class Server:
                     if coord is False:
                         # Avisa (?) os clientes que moio
                         pass
-                        
+
                     atual = player1 if turn == 1 else player2 
                     inimigo = player1 if turn == 2 else player2 
 
@@ -79,8 +92,6 @@ class Server:
                         self.clientSockets[1 if turn == 2 else 2].send(coord.encode('utf-8'))
 
     def registerPlayer(self):
-        self.server_socket.bind((self.CLIENT_IP, self.PORT))
-        self.server_socket.listen(self.QUEUE_SIZE)
 
         client_socket, _= self.server_socket.accept()
 
@@ -89,15 +100,25 @@ class Server:
         self.clientSockets_lists.append(client_socket)
         
         vez = self.SUA_VEZ if self.num_registered_players == 1 else self.ESPERA_VEZ 
+        print(vez, self.num_registered_players)
         client_socket.send(vez.encode('utf-8'))
 
     def posiciona_ships(self, player, turn):
         for ship in player.battle_map.ships:
             posicao = self.receive_message(turn)
+            #print(posicao)
+            #self.clientSockets[turn].close
             if not player.battle_map.place_ship(posicao, ship):
                 self.clientSockets[turn].send(self.POSICAO_INVALIDA.encode('utf-8'))
             else:
                 self.clientSockets[turn].send(self.POSICAO_VALIDA.encode('utf-8'))
+        
+        if(turn == 1):
+            self.clientSockets[2].send(self.UNBLOCK2.encode('utf-8'))
+        else:
+            self.clientSockets[1].send(self.UNBLOCK1.encode('utf-8'))
+
+        
 
     def receive_message(self, turn):
 
@@ -105,11 +126,14 @@ class Server:
             mensagem = self.clientSockets[turn].recv(self.MESSAGE_LENGTH)
 
             if not len(mensagem):
+                print("Ta saindo no len")
                 return False
 
             return mensagem.decode('utf-8')
 
-        except:
+        except Exception as error:
+            print(error)
+            print("Ta saindo no except")
             return False
 
     def informaResultados(self, vencedor):
